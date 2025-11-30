@@ -31,11 +31,11 @@ export const Header = () => {
                 <Box className="px-4 flex flex-row items-center">
                     {pathName !== '/' && (
                         <Pressable onPress={() => router.back()}>
-                            <Icon as={ArrowLeft} size='xl' className="text-white" />
+                            <Icon as={ArrowLeft} size='xl' className="text-white px-1" style={{ width: 32, height: 32 }} />
                         </Pressable>
                     )}
-                    <Input className="bg-white rounded-full h-10 flex-1"  >
-                        <InputSlot className="ps-2">
+                    <Input className="bg-white rounded-full h-12 flex-1 "    >
+                        <InputSlot className="ps-3">
                             <InputIcon as={Search} className="text-gray-500" />
                         </InputSlot>
                         <InputField
@@ -47,7 +47,7 @@ export const Header = () => {
                             returnKeyType="search"
                         />
 
-                        <InputSlot className="pe-2">
+                        <InputSlot className="pe-3">
                             <Pressable onPress={() => showAlert('Find it with an image')}>
                                 <InputIcon as={Camera} className="text-gray-500" />
                             </Pressable>

@@ -11,36 +11,84 @@ import { Icon } from "@/components/ui/icon";
 import { Spinner } from "@/components/ui/spinner";
 import { Divider } from "@/components/ui/divider";
 import { useLocalSearchParams, router } from 'expo-router';
-import { Header } from '../../../components';
-import { productAPI } from '../../../services/api';
-import { Product } from '../../../types';
+import { Header, ReviewList, AddReviewModal, ShareModal, ProductCard } from '../../../components';
+import { productAPI, reviewAPI } from '../../../services/api';
+import { Product, Review } from '../../../types';
 import { useCart } from '../../../context/CartContext';
-import { Star, Heart, Share2 } from 'lucide-react-native';
+import { Star, Heart, Share2, MessageSquare } from 'lucide-react-native';
 import { useWishlist } from '../../../context/WishlistContext';
 import { Pressable } from '@/components/ui/pressable';
+import { useAuth } from '../../../context/AuthContext';
 
 const { width } = Dimensions.get('window');
 
 export default function ProductDetailScreen() {
     const { id } = useLocalSearchParams();
     const [product, setProduct] = useState<Product | null>(null);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
+    const [youMightLikeProducts, setYouMightLikeProducts] = useState<Product[]>([]);
+    const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+    const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+    const [isSubmittingReview, setIsSubmittingReview] = useState(false);
     const [loading, setLoading] = useState(true);
     const { addToCart } = useCart();
     const { isInWishlist, toggleWishlist } = useWishlist();
+    const { user } = useAuth();
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchProductAndReviews = async () => {
             try {
-                const response = await productAPI.getById(Number(id));
-                setProduct(response.data);
+                const [productRes, reviewsRes] = await Promise.all([
+                    productAPI.getById(Number(id)),
+                    reviewAPI.getByProduct(id.toString())
+                ]);
+                setProduct(productRes.data);
+                setReviews(reviewsRes.data);
+
+                // Fetch related products based on category
+                if (productRes.data) {
+                    const categoryRes = await productAPI.getByCategory(productRes.data.categoryId);
+                    const allCategoryProducts = categoryRes.data;
+
+                    setRelatedProducts(allCategoryProducts.filter(p => p.subCategoryId === productRes.data.subCategoryId && p.id !== productRes.data.id));
+                    setYouMightLikeProducts(allCategoryProducts.filter(p => p.subCategoryId !== productRes.data.subCategoryId && p.id !== productRes.data.id));
+                }
             } catch (error) {
-                console.error('Error fetching product:', error);
+                console.error('Error fetching product or reviews:', error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchProduct();
+        fetchProductAndReviews();
     }, [id]);
+
+    const handleAddReview = async (rating: number, comment: string) => {
+        if (!user) {
+            // Ideally show login modal or redirect
+            alert('Please login to write a review');
+            return;
+        }
+
+        setIsSubmittingReview(true);
+        try {
+            const newReview = {
+                productId: id.toString(),
+                userId: user.id,
+                userName: user.name || 'Anonymous',
+                rating,
+                comment
+            };
+            const response = await reviewAPI.create(newReview);
+            setReviews(prev => [response.data as Review, ...prev]);
+            setIsReviewModalOpen(false);
+        } catch (error) {
+            console.error('Error submitting review:', error);
+            alert('Failed to submit review');
+        } finally {
+            setIsSubmittingReview(false);
+        }
+    };
 
     if (loading) {
         return (
@@ -64,6 +112,9 @@ export default function ProductDetailScreen() {
         <Box className="flex-1 bg-white">
             <Header />
             <ScrollView>
+                <Heading className="text-xl flex-1 px-4 m-1">{product.name}</Heading>
+
+
                 <Box className="relative">
                     <ScrollView horizontal pagingEnabled showsHorizontalScrollIndicator={false}>
                         {product.images.map((image, index) => (
@@ -79,19 +130,16 @@ export default function ProductDetailScreen() {
                     </ScrollView>
 
                     <Box className="absolute top-2 right-2 flex-row">
-                        <Button variant="link" onPress={() => { }} className="p-2">
+                        <Button variant="link" onPress={() => setIsShareModalOpen(true)} className="p-2">
                             <Icon as={Share2} className="text-gray-500" />
                         </Button>
                     </Box>
                 </Box>
 
                 <VStack className="gap-4 p-4">
-                    <HStack className="justify-between items-start">
-                        <Heading className="text-xl flex-1">{product.name}</Heading>
-                    </HStack>
 
                     <HStack className="items-center gap-1">
-                        <Text className="font-bold">{product.rating}</Text>
+                        <Text className="font-bold">{product.rating.toFixed(1)}</Text>
                         <HStack>
                             {[1, 2, 3, 4, 5].map((star) => (
                                 <Icon
@@ -129,10 +177,10 @@ export default function ProductDetailScreen() {
                         <Text className="text-gray-600">Brand:</Text>
                         <Button
                             variant='link'
-                            // className="font-bold text-primary-500 underline"
-                            onPress={() => router.push({ pathname: '/(tabs)/search', params: { q: product.brand } })}
+                            className="font-bold text-primary-500 underline"
+                            onPress={() => router.push({ pathname: '/(tabs)/search', params: { brand: product.brand } })}
                         >
-                            {product.brand}
+                            <ButtonText>{product.brand}</ButtonText>
                         </Button>
                     </HStack>
 
@@ -140,11 +188,20 @@ export default function ProductDetailScreen() {
                         <Text className="text-gray-600">Category:</Text>
                         <Button
                             variant='link'
-                            // className="font-bold text-primary-500 underline"
+                            className="font-bold text-primary-500 underline"
                             onPress={() => router.push({ pathname: '/(tabs)/search', params: { categoryId: product.categoryId } })}
                         >
-                            {typeof product.category === 'object' ? product.category.name : product.category || "Unknown Category"}
+                            <ButtonText>{product.category} </ButtonText>
                         </Button>
+                        <Text className="text-gray-600">/</Text>
+                        <Button
+                            variant='link'
+                            className="font-bold text-primary-500 underline"
+                            onPress={() => router.push({ pathname: '/(tabs)/search', params: { categoryId: product.categoryId, subCategoryId: product.subCategoryId } })}
+                        >
+                            <ButtonText>{product.subCategory}</ButtonText>
+                        </Button>
+
                     </HStack>
 
                     <VStack className="gap-4 mt-4">
@@ -183,8 +240,65 @@ export default function ProductDetailScreen() {
                     <Text className="text-gray-700 leading-md">
                         {product.description || "No description available for this product."}
                     </Text>
+
+                    <Divider className="my-4" />
+
+                    <Divider className="my-4" />
+
+                    {relatedProducts.length > 0 && (
+                        <Box className="mb-6">
+                            <Heading className="text-lg mb-2">Related Products</Heading>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                {relatedProducts.map(item => (
+                                    <Box key={item.id} className="w-48 mr-2">
+                                        <ProductCard product={item} />
+                                    </Box>
+                                ))}
+                            </ScrollView>
+                        </Box>
+                    )}
+
+                    {youMightLikeProducts.length > 0 && (
+                        <Box className="mb-6">
+                            <Heading className="text-lg mb-2">You Might Also Like</Heading>
+                            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                                {youMightLikeProducts.map(item => (
+                                    <Box key={item.id} className="w-48 mr-2">
+                                        <ProductCard product={item} />
+                                    </Box>
+                                ))}
+                            </ScrollView>
+                        </Box>
+                    )}
+
+                    <HStack className="justify-between items-center mb-4">
+                        <Heading className="text-md">Customer Reviews</Heading>
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onPress={() => setIsReviewModalOpen(true)}
+                            className="border-gray-300"
+                        >
+                            <ButtonText className="text-black text-xs">Write a Review</ButtonText>
+                        </Button>
+                    </HStack>
+
+                    <ReviewList reviews={reviews} />
                 </VStack>
             </ScrollView>
+
+            <AddReviewModal
+                isOpen={isReviewModalOpen}
+                onClose={() => setIsReviewModalOpen(false)}
+                onSubmit={handleAddReview}
+                isSubmitting={isSubmittingReview}
+            />
+            <ShareModal
+                isOpen={isShareModalOpen}
+                onClose={() => setIsShareModalOpen(false)}
+                productUrl={`https://amazon-clone.com/product/${id}`}
+                productName={product.name}
+            />
         </Box>
     );
 }

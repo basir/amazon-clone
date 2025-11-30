@@ -51,7 +51,7 @@ export default function OrderDetailScreen() {
 
     return (
         <Box className="flex-1 bg-gray-100">
-            <Header />
+            {/* <Header /> */}
             <ScrollView>
                 <VStack className="gap-4 p-4">
                     <Heading className="text-xl">Order Details</Heading>

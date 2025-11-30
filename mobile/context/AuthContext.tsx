@@ -45,14 +45,36 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return () => unsubscribe();
     }, []);
 
+    // const login = async (email: string, password?: string) => {
+    //     if (!password) throw new Error('Password is required');
+    //     await signInWithEmailAndPassword(auth, email, password);
+
+    // };
     const login = async (email: string, password?: string) => {
-        if (!password) throw new Error('Password is required');
-        await signInWithEmailAndPassword(auth, email, password);
+        if (!password) {
+            throw new Error('Password is required');
+        }
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            console.log("Login successful!");
+        } catch (error: any) { // Use 'any' for simpler error handling, or specific FirebaseError type
+            console.error("Firebase Authentication Error:", error.code, error.message);
+            // You can add more specific handling here based on error.code
+            if (error.code === 'auth/wrong-password') {
+                console.log('The password you entered is incorrect.');
+            } else if (error.code === 'auth/user-not-found') {
+                console.log('No account found with that email address.');
+            } else {
+                console.log(error.message);
+            }
+            throw error; // Re-throw if you want to propagate the error further
+        }
     };
+
 
     const register = async (userData: Partial<User>) => {
         if (!userData.email || !userData.password) throw new Error('Email and password required');
-
+        console.log("Registering user:", userData);
         const userCredential = await createUserWithEmailAndPassword(auth, userData.email, userData.password);
         const firebaseUser = userCredential.user;
 

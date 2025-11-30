@@ -6,5 +6,6 @@ clone-final-29f3b-firebase-adminsdk-fbsvc-6edff5612c.json
 
 # local env files
 .env*.local
-
+.env
 firebase-debug.log
+functions/.env.clone-final-29f3b

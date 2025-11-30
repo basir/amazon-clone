@@ -9,9 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
+      "bundleIdentifier": "com.aiwithbasir.amazon",
       "supportsTablet": true
     },
     "android": {
+      "package": "com.aiwithbasir.amazon",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",

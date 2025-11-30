@@ -62,8 +62,8 @@ const buttonStyle = tva({
       xs: 'px-3.5 h-8',
       sm: 'px-4 h-9',
       md: 'px-5 h-10',
-      lg: 'px-6 h-11',
-      xl: 'px-7 h-12',
+      lg: 'px-6 h-12',
+      xl: 'px-7 h-14',
     },
   },
   compoundVariants: [
@@ -289,7 +289,7 @@ const Button = React.forwardRef<
   IButtonProps
 >(
   (
-    { className, variant = 'solid', size = 'md', action = 'primary', ...props },
+    { className, variant = 'solid', size = 'lg', action = 'primary', ...props },
     ref
   ) => {
     return (

@@ -73,7 +73,7 @@ export default function HomeScreen() {
                             <Heading className="text-md mb-2">Deals of the Day</Heading>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 {deals.map(product => (
-                                    <Box key={product.id} className="w-40">
+                                    <Box key={product.id} className="w-48">
                                         <ProductCard product={product} />
                                     </Box>
                                 ))}
@@ -86,7 +86,7 @@ export default function HomeScreen() {
                             <Heading className="text-md mb-2">Best Sellers</Heading>
                             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                                 {bestsellers.map(product => (
-                                    <Box key={product.id} className="w-40">
+                                    <Box key={product.id} className="w-48">
                                         <ProductCard product={product} />
                                     </Box>
                                 ))}

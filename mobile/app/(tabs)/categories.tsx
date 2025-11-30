@@ -55,7 +55,7 @@ export default function CategoriesScreen() {
                     className="border-none shadow-none"
                 >{categories
                     .map((category: Category) => (
-                        <AccordionItem className='border border-gray-200 rounded-lg my-1' key={category.id} value={category.id} >
+                        <AccordionItem className='border border-gray-300 rounded-lg my-1' key={category.id} value={category.id} >
                             <AccordionHeader>
                                 <AccordionTrigger className='w-full'>
                                     {({ isExpanded }: { isExpanded: boolean }) => {
@@ -72,9 +72,9 @@ export default function CategoriesScreen() {
                                                 </AccordionTitleText>
                                             </View>
                                             {isExpanded ? (
-                                                <AccordionIcon as={ChevronUpIcon} className="ml-3" />
+                                                <AccordionIcon as={ChevronUpIcon} className="-ml-3" />
                                             ) : (
-                                                <AccordionIcon as={ChevronDownIcon} className="ml-3" />
+                                                <AccordionIcon as={ChevronDownIcon} className="-ml-3" />
                                             )}
                                         </View>
                                         );
@@ -82,20 +82,22 @@ export default function CategoriesScreen() {
                                 </AccordionTrigger>
                             </AccordionHeader>
                             <AccordionContent>
-                                {category.subCategories.map((subCategory) => (
+                                {category.subCategories?.map((subCategory) => (
                                     <Pressable
                                         key={subCategory.id}
                                         onPress={() => router.push({ pathname: '/search', params: { categoryId: category.id, subCategoryId: subCategory.id } })}
                                     >
                                         <Box
-                                            className="  p-2 rounded-lg border m-1 flex-row items-center"
+                                            className="  p-2 rounded-lg border border-gray-300  m-1 flex-row items-center"
                                         >
-                                            <Image
-                                                source={{ uri: subCategory.image }}
-                                                alt={subCategory.name}
-                                                className="h-[60px] w-[60px] rounded-md mr-4"
-                                            />
-                                            <Text className=" ">{subCategory.name}</Text>
+                                            {subCategory.image &&
+                                                <Image
+                                                    source={{ uri: subCategory.image }}
+                                                    alt={subCategory.name}
+                                                    className="h-[60px] w-[60px] rounded-md mr-4"
+                                                />
+                                            }
+                                            <Text>{subCategory.name}</Text>
                                         </Box>
                                     </Pressable>
                                 ))}

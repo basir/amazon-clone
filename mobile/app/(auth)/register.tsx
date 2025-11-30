@@ -10,9 +10,9 @@ import { router } from 'expo-router';
 import { useAuth } from '../../context/AuthContext';
 
 export default function Register() {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [name, setName] = useState('Demo User');
+    const [email, setEmail] = useState('demo@example.com');
+    const [password, setPassword] = useState('password123');
     const [error, setError] = useState('');
     const { register } = useAuth();
 

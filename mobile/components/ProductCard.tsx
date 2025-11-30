@@ -38,7 +38,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
     return (
         <Pressable onPress={handlePress} className="flex-1 m-1">
-            <Box className="bg-white rounded-lg border">
+            <Box className="bg-white rounded-lg border border-gray-300">
                 <Box className="relative">
                     <Box className="w-full aspect-square overflow-hidden rounded-t-lg">
                         <Image
@@ -64,7 +64,7 @@ export const ProductCard = ({ product }: ProductCardProps) => {
 
                     <HStack className="items-center gap-1">
                         <Icon as={Star} className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-                        <Text className="text-xs text-gray-500">{product.rating}</Text>
+                        <Text className="text-xs text-gray-500">{product.rating.toFixed(1)}</Text>
                     </HStack>
 
                     <HStack className="items-center gap-1">

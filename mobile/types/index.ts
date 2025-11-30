@@ -23,9 +23,9 @@ export interface Product {
     price: number;
     originalPrice?: number;
     categoryId: string;
-    subCategoryId?: string;
-    category?: Category;
-    subCategory?: { id: string; name: string };
+    subCategoryId: string;
+    category: string;
+    subCategory: string;
     images: string[];
     inStock: boolean;
     stockQuantity: number;
@@ -42,7 +42,7 @@ export interface Category {
     name: string;
     image: string;
     order: number;
-    subCategories?: { id: string; name: string }[];
+    subCategories?: { id: string; name: string; image: string }[];
 }
 
 export interface Banner {

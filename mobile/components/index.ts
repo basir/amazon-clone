@@ -5,3 +5,6 @@ export * from './EmptyState';
 export * from './CategoryList';
 export * from './BannerCarousel';
 export * from './FilterModal';
+export * from './ReviewList';
+export * from './AddReviewModal';
+export * from './ShareModal';

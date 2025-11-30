@@ -58,7 +58,7 @@ export default function OrdersScreen() {
     if (orders.length === 0) {
         return (
             <Box className="flex-1 bg-white">
-                <Header />
+                {/* <Header /> */}
                 <EmptyState
                     icon={Package}
                     title="No Orders Yet"
@@ -72,7 +72,7 @@ export default function OrdersScreen() {
 
     return (
         <Box className="flex-1 bg-gray-100">
-            <Header />
+            {/* <Header /> */}
             <ScrollView
                 refreshControl={
                     <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#007185" />

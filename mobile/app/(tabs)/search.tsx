@@ -16,7 +16,7 @@ import { productAPI } from '../../services/api';
 import { Product, ProductFilter } from '../../types';
 
 export default function SearchScreen() {
-    const { q, categoryId, subCategoryId } = useLocalSearchParams();
+    const { q, categoryId, subCategoryId, brand } = useLocalSearchParams();
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
     const [sortOrder, setSortOrder] = useState<ProductFilter['sortOrder']>();
@@ -25,8 +25,21 @@ export default function SearchScreen() {
     const [filterParams, setFilterParams] = useState({
         priceRange: 'all',
         rating: 'all',
-        inStock: false
+        inStock: false,
+        categoryId: (categoryId as string) || '',
+        subCategoryId: (subCategoryId as string) || '',
+        brand: (brand as string) || ''
     });
+
+    // Update filterParams when URL params change
+    useEffect(() => {
+        setFilterParams(prev => ({
+            ...prev,
+            categoryId: (categoryId as string) || prev.categoryId,
+            subCategoryId: (subCategoryId as string) || prev.subCategoryId,
+            brand: (brand as string) || prev.brand
+        }));
+    }, [categoryId, subCategoryId, brand]);
 
     const handleApplyFilter = (filters: any) => {
         setFilterParams(filters);
@@ -37,8 +50,11 @@ export default function SearchScreen() {
             setLoading(true);
             try {
                 const filter: ProductFilter = {};
-                if (categoryId) filter.categoryId = categoryId as string;
-                if (subCategoryId) filter.subCategoryId = subCategoryId as string;
+                // Prioritize filterParams over URL params if set, or sync them
+                if (filterParams.categoryId) filter.categoryId = filterParams.categoryId;
+                if (filterParams.subCategoryId) filter.subCategoryId = filterParams.subCategoryId;
+                if (filterParams.brand) filter.brand = filterParams.brand;
+
                 if (q) filter.query = (q as string);
                 if (sortOrder) filter.sortOrder = sortOrder;
                 if (isDeal) filter.isDeal = true;
@@ -86,7 +102,7 @@ export default function SearchScreen() {
         };
 
         fetchProducts();
-    }, [q, categoryId, subCategoryId, sortOrder, isDeal, filterParams]);
+    }, [q, sortOrder, isDeal, filterParams]);
 
     return (
         <Box className="flex-1 bg-gray-100">
@@ -94,7 +110,7 @@ export default function SearchScreen() {
             <ScrollView>
                 <Box className="p-4">
                     <Heading className="text-xl mb-4">
-                        {q ? `Search results for "${q}"` : subCategoryId ? 'Subcategory Results' : categoryId ? 'Category Results' : 'All Products'}
+                        {q ? `Search results for "${q}"` : filterParams.brand ? `${filterParams.brand} Products` : filterParams.subCategoryId ? 'Subcategory Results' : filterParams.categoryId ? 'Category Results' : 'All Products'}
                     </Heading>
 
                     <HStack className="mb-4 gap-2">

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ScrollView, Alert } from 'react-native';
 import { Box } from '@/components/ui/box';
 import { Text } from '@/components/ui/text';
@@ -16,10 +16,13 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { orderAPI } from '../services/api';
 import { router } from 'expo-router';
+import { useStripe } from '@/utils/stripe';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 
 export default function CheckoutScreen() {
     const { items, totalAmount, clearCart } = useCart();
     const { user } = useAuth();
+    const { initPaymentSheet, presentPaymentSheet } = useStripe();
     const [address, setAddress] = useState({
         street: '123 Main St',
         city: 'Seattle',
@@ -30,11 +33,59 @@ export default function CheckoutScreen() {
     const [paymentMethod, setPaymentMethod] = useState('card');
     const [loading, setLoading] = useState(false);
 
+    const fetchPaymentIntentClientSecret = async () => {
+        try {
+            const functions = getFunctions();
+            const createPaymentIntent = httpsCallable(functions, 'createPaymentIntent');
+            const response = await createPaymentIntent({
+                amount: totalAmount,
+                currency: 'usd',
+            });
+            const { clientSecret } = response.data as any;
+            return clientSecret;
+        } catch (error) {
+            console.error('Error fetching payment intent:', error);
+            Alert.alert('Error', 'Failed to initialize payment. Please try again.');
+            return null;
+        }
+    };
+
+    const initializePaymentSheet = async () => {
+        const clientSecret = await fetchPaymentIntentClientSecret();
+        if (!clientSecret) return;
+
+        const { error } = await initPaymentSheet({
+            paymentIntentClientSecret: clientSecret,
+            merchantDisplayName: 'Amazon Clone',
+            returnURL: 'your-app-scheme://stripe-redirect', // Replace with your app scheme
+        });
+
+        if (error) {
+            Alert.alert('Error', error.message);
+        }
+    };
+
+    useEffect(() => {
+        if (paymentMethod === 'card' && totalAmount > 0) {
+            initializePaymentSheet();
+        }
+    }, [paymentMethod, totalAmount]);
+
     const handlePlaceOrder = async () => {
         if (!user) return;
         setLoading(true);
 
         try {
+            if (paymentMethod === 'card') {
+                const { error } = await presentPaymentSheet();
+
+                if (error) {
+                    Alert.alert(`Error code: ${error.code}`, error.message);
+                    setLoading(false);
+                    return;
+                }
+            }
+
             const orderData = {
                 userId: user.id,
                 items: items.map(item => ({
@@ -48,7 +99,7 @@ export default function CheckoutScreen() {
                 shippingAddress: { ...address, id: Date.now().toString() },
                 status: 'pending',
                 statusHistory: [{ status: 'pending', date: new Date().toISOString() }],
-                paymentStatus: 'paid',
+                paymentStatus: paymentMethod === 'card' ? 'paid' : 'pending',
                 createdAt: new Date().toISOString(),
                 orderNumber: `AMZ-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.floor(Math.random() * 10000)}`
             };
@@ -144,7 +195,7 @@ export default function CheckoutScreen() {
                             isDisabled={loading}
                         >
                             {loading ? (
-                                <ButtonText className="text-black">Placing Order...</ButtonText>
+                                <ButtonText className="text-black">Processing...</ButtonText>
                             ) : (
                                 <ButtonText className="text-black">Place Your Order</ButtonText>
                             )}

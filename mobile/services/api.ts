@@ -1,6 +1,6 @@
 import { db } from '../firebaseConfig';
 import { collection, getDocs, getDoc, doc, query, where, addDoc, updateDoc, setDoc, orderBy, limit } from 'firebase/firestore';
-import { Product, Category, Cart, Order, Wishlist, Banner, ProductFilter } from '../types';
+import { Product, Category, Cart, Order, Wishlist, Banner, ProductFilter, Review } from '../types';
 import { startAt, endAt } from 'firebase/firestore';
 
 // Helper to simulate Axios response structure
@@ -145,6 +145,12 @@ export const productAPI = {
 
         return response(products);
     },
+    getBrands: async () => {
+        const querySnapshot = await getDocs(collection(db, 'products'));
+        const products = querySnapshot.docs.map(doc => doc.data() as Product);
+        const brands = Array.from(new Set(products.map(p => p.brand))).sort();
+        return response(brands);
+    },
 };
 
 export const cartAPI = {
@@ -201,6 +207,22 @@ export const wishlistAPI = {
         const docRef = doc(db, 'wishlist', id);
         await updateDoc(docRef, data);
         return response(data);
+    }
+};
+
+export const reviewAPI = {
+    getByProduct: async (productId: string) => {
+        const q = query(collection(db, 'reviews'), where('productId', '==', productId));
+        const querySnapshot = await getDocs(q);
+        const reviews = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Review));
+        return response(reviews);
+    },
+    create: async (review: any) => {
+        const docRef = await addDoc(collection(db, 'reviews'), {
+            ...review,
+            createdAt: new Date().toISOString()
+        });
+        return response({ id: docRef.id, ...review });
     }
 };
 

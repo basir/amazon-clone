@@ -8,6 +8,7 @@ export default function TabLayout() {
 
     return (
         <Tabs
+            backBehavior="history"
             screenOptions={{
                 headerShown: false,
                 tabBarActiveTintColor: '#ff6200',
@@ -17,19 +18,19 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="index"
                 options={{
-                    tabBarIcon: ({ color }) => <Icon as={Home} color={color} size='xl' />,
+                    tabBarIcon: ({ color }) => <Icon as={Home} color={color} size='xl' style={{ width: 30, height: 30, paddingTop: 4 }} />,
                 }}
             />
             <Tabs.Screen
                 name="profile"
                 options={{
-                    tabBarIcon: ({ color }) => <Icon as={User} color={color} size='xl' />,
+                    tabBarIcon: ({ color }) => <Icon as={User} color={color} size='xl' style={{ width: 30, height: 30, paddingTop: 4 }} />,
                 }}
             />
             <Tabs.Screen
                 name="cart"
                 options={{
-                    tabBarIcon: ({ color }) => <Icon as={ShoppingCart} color={color} size='xl' />,
+                    tabBarIcon: ({ color }) => <Icon as={ShoppingCart} color={color} size='xl' style={{ width: 30, height: 30, paddingTop: 4 }} />,
                     tabBarBadge: itemCount > 0 ? itemCount : undefined,
                 }}
             />
@@ -37,7 +38,7 @@ export default function TabLayout() {
             <Tabs.Screen
                 name="categories"
                 options={{
-                    tabBarIcon: ({ color }) => <Icon as={Menu} color={color} size='xl' />,
+                    tabBarIcon: ({ color }) => <Icon as={Menu} color={color} size='xl' style={{ width: 30, height: 30, paddingTop: 4 }} />,
                 }}
             />
 
