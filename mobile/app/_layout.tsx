@@ -3,13 +3,18 @@ import '@/global.css'
 import { Stack } from "expo-router";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { AuthProvider, CartProvider, WishlistProvider } from "../context";
+import * as Linking from 'expo-linking';
 
 import { StripeProvider } from "@/utils/stripe";
 
 export default function RootLayout() {
+    const urlScheme = Linking.createURL('/');
     return (
         <SafeAreaProvider>
-            <StripeProvider publishableKey={process.env.STRIPE_PUBLISHABLE_KEY!}>
+            <StripeProvider
+                publishableKey={process.env.EXPO_PUBLIC_STRIPE_PUBLISHABLE_KEY!}
+                urlScheme={urlScheme}
+            >
                 <GluestackUIProvider mode="light">
                     <AuthProvider>
                         <CartProvider>

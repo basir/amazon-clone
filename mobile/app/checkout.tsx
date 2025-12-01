@@ -18,6 +18,7 @@ import { orderAPI } from '../services/api';
 import { router } from 'expo-router';
 import { useStripe } from '@/utils/stripe';
 import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from '../firebaseConfig';
 
 export default function CheckoutScreen() {
     const { items, totalAmount, clearCart } = useCart();
@@ -35,7 +36,7 @@ export default function CheckoutScreen() {
 
     const fetchPaymentIntentClientSecret = async () => {
         try {
-            const functions = getFunctions();
+            const functions = getFunctions(app);
             const createPaymentIntent = httpsCallable(functions, 'createPaymentIntent');
             const response = await createPaymentIntent({
                 amount: totalAmount,
@@ -54,14 +55,19 @@ export default function CheckoutScreen() {
         const clientSecret = await fetchPaymentIntentClientSecret();
         if (!clientSecret) return;
 
-        const { error } = await initPaymentSheet({
-            paymentIntentClientSecret: clientSecret,
-            merchantDisplayName: 'Amazon Clone',
-            returnURL: 'your-app-scheme://stripe-redirect', // Replace with your app scheme
-        });
-
-        if (error) {
-            Alert.alert('Error', error.message);
+        try {
+            const { error } = await initPaymentSheet({
+                paymentIntentClientSecret: clientSecret,
+                merchantDisplayName: 'Amazon Clone',
+                customFlow: false,
+                // returnURL: 'myapp://stripe-redirect', // Replace with your app scheme
+            });
+            if (error) {
+                Alert.alert('Error', error.message);
+            }
+        } catch (error: any) {
+            console.error('initPaymentSheet error:', error);
+            Alert.alert('Error', error.message || 'Failed to initialize payment sheet');
         }
     };
 

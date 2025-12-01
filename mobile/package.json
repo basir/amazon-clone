@@ -5,10 +5,14 @@
   "scripts": {
     "start": "expo start",
     "reset-project": "node ./scripts/reset-project.js",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "id": "npx expo run:ios --configuration Debug",
+    "ir": "npx expo run:ios --configuration Release --device",
+    "ad": "npx expo run:android --variant debug",
+    "ar": "npx expo run:android --variant release"
   },
   "dependencies": {
     "@expo/html-elements": "^0.12.5",
@@ -16,6 +20,7 @@
     "@gluestack-ui/core": "^3.0.12",
     "@gluestack-ui/utils": "^3.0.12",
     "@legendapp/motion": "^2.5.3",
+    "@react-native-async-storage/async-storage": "^2.2.0",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
