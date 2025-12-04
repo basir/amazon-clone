@@ -3,11 +3,11 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "seed": "node seed.js"
+        "seed": "node seed.js",
+        "deploy": "firebase deploy"
     },
     "dependencies": {
         "dotenv": "^17.2.3",
-        "firebase": "^10.8.0",
         "firebase-admin": "^13.6.0"
     }
 }
