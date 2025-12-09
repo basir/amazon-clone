@@ -151,21 +151,27 @@ In this section, we will generate mobile app for web, android and ios.
     npx expo export --platform web
     ```
 2. Create expo account at [expo.dev](https://expo.dev)
-3. Install Expo CLI
+3. Create project on expo.dev and copy project id.
+4. Install Expo CLI
     ```bash
     npm install -g expo-cli
     ```
-4. Open terminal and login to expo
+5. Open terminal and login to expo
     ```bash
         eas login      
         # enter your email and password
         # Logged in
     ```
-5. Deploy web app
+6. Connect project to expo
+
+    ```bash
+        eas init --id project-id 
+    ```
+7. Deploy web app
     ```bash
         eas deploy 
     ```
-6. open https://your-app-name.expo.app
+8. open https://your-app-name.expo.app
 
 
 #### Android App
@@ -184,8 +190,6 @@ For this section, you need to have an Android device.
     - Configure eas
     ```bash
         eas build:configure
-        # enter yes to automatically create an EAS project for @your_username/amazon-clone-app
-        # enter yes to link local project to EAS project
         # enter all to configure for ios and android
     ```
     - Build android app
