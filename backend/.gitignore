@@ -2,10 +2,10 @@
 # dependencies
 node_modules/
 
-clone-final-29f3b-firebase-adminsdk-fbsvc-6edff5612c.json
+clone-cab27-firebase-adminsdk-fbsvc-a0c4b207e0.json
 
 # local env files
 .env*.local
 .env
 firebase-debug.log
-functions/.env.clone-final-29f3b
+functions/.env.clone-cab27

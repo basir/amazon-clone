@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Amazon Clone",
-    "slug": "amazon-clone-app",
+    "slug": "amazon-clone",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -52,8 +52,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "aa0c6188-2a1d-4bbc-b53e-98ce102e3397"
+        "projectId": "ca153cda-f4d4-4546-bd76-6b949ddc2116"
       }
-    }
+    },
+    "owner": "basirjafarzadeh1"
   }
 }
